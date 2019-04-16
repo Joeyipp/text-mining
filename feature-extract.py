@@ -6,6 +6,7 @@ import nltk
 # nltk.download('stopwords')
 import jsonpickle
 
+from tqdm import tqdm
 from collections import OrderedDict
 from nltk.tokenize import RegexpTokenizer
 from nltk.stem.snowball import EnglishStemmer
@@ -148,12 +149,12 @@ class Document:
         self.classlabel = int(classlabel)
 
 def doc_parser(doc, classlabel):
-    with open(doc, 'r') as f:
+    with open(doc, 'r', encoding = 'unicode_escape') as f:
         body = ""
         docid = doc.split("/")[-1]
         list_of_text = []
         num_lines = 0
-
+        
         line = f.readline().strip()
         while line != "":
             if line.startswith("Subject"):
@@ -203,35 +204,35 @@ def class_definition():
 
 def main():
 
-    # # Get directory of newsgroups data
-    # directory_of_newsgroups_data = sys.argv[1]
-    # path = os.path.join(os.getcwd(), directory_of_newsgroups_data)
+    # Get directory of newsgroups data
+    directory_of_newsgroups_data = sys.argv[1]
+    mini_newsgroups = os.path.join(os.getcwd(), directory_of_newsgroups_data)
 
     # # List of output files
     # feature_definition_file = sys.argv[2]
     # class_definition_file = sys.argv[3]
     # training_data_file = sys.argv[4]
 
-    # # for newsgroups_directory in os.listdir(path):
-    # #     print(newsgroups_directory)
-
-    # index = Index(nltk.word_tokenize, EnglishStemmer(), nltk.corpus.stopwords.words('english'))
-
-    # # Write to class_definition_file (DONE)
-    # with open(class_definition_file, 'w') as f:
-    #     class_mappings = class_definition()
-    #     for mapping in class_mappings:
-    #         f.write(mapping + '\n')
-
-    path = os.path.join(os.getcwd(), "51121")
-    doc = doc_parser(path, 1)
-
-    
     invertedIndex = InvertedIndex()
-    invertedIndex.indexDoc(doc)
+    class_mappings = class_definition()
 
+    for newsgroups_directory in os.listdir(mini_newsgroups):
+        classlabel = class_mappings[newsgroups_directory]
+        documents_path = os.path.join(mini_newsgroups, newsgroups_directory)
+        print("\n-> Indexing {}".format(documents_path))
 
+        with tqdm(total=len(os.listdir(documents_path))) as pbar:
+            for document in os.listdir(documents_path):
+                doc = os.path.join(documents_path, document)
+                print(document)
+                docObj = doc_parser(doc, classlabel)
+                invertedIndex.indexDoc(docObj)
+                pbar.update(1)
 
+    # Write to class_definition_file
+    # with open(class_definition_file, 'w') as f:
+    #     for mapping in class_mappings:
+    #         f.write(mapping + ", " + str(class_mappings[mapping]))
 
 
 main()
