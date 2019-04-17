@@ -7,6 +7,7 @@ import nltk
 import jsonpickle
 
 from tqdm import tqdm
+from random import shuffle
 from collections import OrderedDict
 from nltk.tokenize import RegexpTokenizer
 from nltk.stem.snowball import EnglishStemmer
@@ -233,6 +234,9 @@ def main():
     # Sort the invertedIndex
     invertedIndex.sort()
 
+    # Shuffle the documents to train the classifiers better!
+    shuffle(parsed_documents)
+
     # Generate features (id and value) and write to training_data_files
     print("\n-> Generating {}s".format(training_data_file))
     with open("{}.TF".format(training_data_file), 'w') as f1:
@@ -286,18 +290,19 @@ def main():
     with open("{}".format(feature_definition_file), 'w') as f:
         for feature in features:
             f.write(str(feature[0]) + ", " + feature[1] + "\n")
-    print("Operation complete!")
+    print("Done!")
 
     # Write to class_definition_file
     print("\n-> Generating {}".format(class_definition_file))
     with open("{}".format(class_definition_file), 'w') as f:
         for mapping in class_mappings:
             f.write(mapping + ", " + str(class_mappings[mapping]) + "\n")
-    print("Operation complete!")
+    print("Done!")
     
     print("\n-> All done!")
 
     # Save the invertedIndex
     # invertedIndex.save("index_file")
 
-main()
+if __name__ == '__main__':
+    main()
