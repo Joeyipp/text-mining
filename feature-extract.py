@@ -77,13 +77,13 @@ class InvertedIndex:
             # Remove stopwords
             if token in self.stopwords:
                 continue
- 
+
             # Stemming
             if self.stemmer:
                 token = self.stemmer.stem(token)
             
             document_terms.append(token)
-
+            
         # Generate the (term, position) pair
         terms_with_positions = []
         for i in range(len(document_terms)):
@@ -113,7 +113,6 @@ class InvertedIndex:
     
     def save(self, filename):
         ''' save to disk'''
-        # ToDo: using your preferred method to serialize/deserialize the index (Done)
         print("Saving to disk...")
         with open(filename, "w") as f:
             for term in self.items:
@@ -125,7 +124,6 @@ class InvertedIndex:
 
     def load(self, filename):
         ''' load from disk'''
-        # ToDo (Done)
         print("Loading from disk...")
         with open(filename, "r") as f:
             data = f.readlines()
@@ -138,7 +136,7 @@ class InvertedIndex:
 
     def idf(self, term):
         ''' compute the inverted document frequency for a given term'''
-        # ToDo: return the IDF of the term
+        # Return the IDF of the term
         # log(total documents/ documents with term i)
         return math.log(self.nDocs / len(self.items[term].sorted_postings), 10)
 
@@ -149,31 +147,28 @@ class Document:
         self.classlabel = int(classlabel)
 
 def doc_parser(doc, classlabel):
-    with open(doc, 'r', encoding = 'unicode_escape') as f:
-        body = ""
-        docid = doc.split("/")[-1]
-        list_of_text = []
-        num_lines = 0
+    # Parse and create a Document Class Object
+    with open(doc, 'r') as f:
+        body = " "
+        docid = doc.split("\\")[-1]
+        textblock = []
+        num_lines = -1
         
-        line = f.readline().strip()
-        while line != "":
+        data = f.readlines()
+        for line in data:
+            num_lines += 1
             if line.startswith("Subject"):
-                subj = ""
-                header = line.split(":")[1:]
-                list_of_text.append(subj.join(header))
+                subj = " "
+                header = line.strip().split(":")[1:]
+                textblock.append(subj.join(header))
 
-            elif line.startswith("Lines"):
-                num_lines = int(line.split(":")[1].strip())
+            elif line == "\n":
+                break
 
-            line = f.readline().strip()
-        
-        i = 0
-        while(i != num_lines):
-            line = f.readline().strip()
-            list_of_text.append(line)
-            i += 1
-    
-    body = body.join(list_of_text)
+        for line in data[num_lines:]:
+            textblock.append(line.strip())
+ 
+    body = body.join(textblock)
     doc = Document(docid, body, classlabel)
 
     return doc
@@ -216,23 +211,44 @@ def main():
     invertedIndex = InvertedIndex()
     class_mappings = class_definition()
 
-    for newsgroups_directory in os.listdir(mini_newsgroups):
-        classlabel = class_mappings[newsgroups_directory]
-        documents_path = os.path.join(mini_newsgroups, newsgroups_directory)
-        print("\n-> Indexing {}".format(documents_path))
+    # for newsgroups_directory in os.listdir(mini_newsgroups):
+    #     classlabel = class_mappings[newsgroups_directory]
+    #     documents_path = os.path.join(mini_newsgroups, newsgroups_directory)
+    #     print("\n-> Indexing {}".format(documents_path))
 
-        with tqdm(total=len(os.listdir(documents_path))) as pbar:
-            for document in os.listdir(documents_path):
-                doc = os.path.join(documents_path, document)
-                print(document)
-                docObj = doc_parser(doc, classlabel)
-                invertedIndex.indexDoc(docObj)
-                pbar.update(1)
+    #     with tqdm(total=len(os.listdir(documents_path))) as pbar:
+    #         for document in os.listdir(documents_path):
+    #             doc = os.path.join(documents_path, document)
+    #             docObj = doc_parser(doc, classlabel)
+    #             invertedIndex.indexDoc(docObj)
+    #             pbar.update(1)
+
+    # print("\nTotal documents indexed: {}".format(invertedIndex.nDocs))
+
+    path = os.path.join(os.getcwd(), "51121")
+    doc = doc_parser(path, 1)
+    invertedIndex.indexDoc(doc)
+
+    # Sort the invertedIndex
+    invertedIndex.sort()
+
+    features = []
+    for item in invertedIndex.items.keys():
+        features.append((invertedIndex.items[item].feature_id, item))
+    features.sort()
+
+    # Write to feature_definition_file
+    with open("feature_definition_file", 'w') as f:
+        for feature in features:
+            f.write(str(feature[0]) + ", " + feature[1] + "\n")
 
     # Write to class_definition_file
-    # with open(class_definition_file, 'w') as f:
-    #     for mapping in class_mappings:
-    #         f.write(mapping + ", " + str(class_mappings[mapping]))
+    with open("class_definition_file", 'w') as f:
+        for mapping in class_mappings:
+            f.write(mapping + ", " + str(class_mappings[mapping]) + "\n")
+    
+    # Save the invertedIndex
+    # invertedIndex.save("index_file")
 
 
 main()
