@@ -240,22 +240,35 @@ def main():
             with open("{}.TFIDF".format(training_data_file), 'w') as f3:
                 with tqdm(total=len(parsed_documents)) as pbar:
                     for document in parsed_documents:
-                        features_tf = []
-                        features_idf = []
-                        features_tfidf = []
+                        features_tf = {}
+                        features_idf = {}
+                        features_tfidf = {}
 
                         for term in document[2]:
                             feature_id = invertedIndex.items[term].feature_id
                             feature_tf = invertedIndex.items[term].posting[document[0]].term_freq()
                             feature_idf = invertedIndex.idf(term)
 
-                            features_tf.append("{}:{}".format(feature_id, feature_tf))
-                            features_idf.append("{}:{:.5f}".format(feature_id, feature_idf))
-                            features_tfidf.append("{}:{:.5f}".format(feature_id, feature_tf * feature_idf))
+                            features_tf[feature_id] = feature_tf
+                            features_idf[feature_id] = feature_idf
+                            features_tfidf[feature_id] = feature_tf * feature_idf
 
-                        training_data_tf = " ".join(features_tf)
-                        training_data_idf = " ".join(features_idf)
-                        training_data_tfidf = " ".join(features_tfidf)
+                        list_tf = []
+                        list_idf = []
+                        list_tfidf = []
+
+                        for key in sorted(features_tf.keys()):
+                            list_tf.append("{}:{}".format(key, features_tf[key]))
+                        
+                        for key in sorted(features_idf.keys()):
+                            list_idf.append("{}:{:.5f}".format(key, features_idf[key]))
+                        
+                        for key in sorted(features_tfidf.keys()):
+                            list_tfidf.append("{}:{:.5f}".format(key, features_tfidf[key]))
+
+                        training_data_tf = " ".join(list_tf)
+                        training_data_idf = " ".join(list_idf)
+                        training_data_tfidf = " ".join(list_tfidf)
 
                         f1.write("{} {}\n".format(document[1], training_data_tf))
                         f2.write("{} {}\n".format(document[1], training_data_idf))
