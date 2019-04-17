@@ -1,0 +1,5 @@
+class_definition_file
+feature_definition_file
+training_data_file.TF
+training_data_file.IDF
+training_data_file.TFIDF

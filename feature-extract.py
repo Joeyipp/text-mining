@@ -21,14 +21,14 @@ class Posting:
         self.positions.append(pos)
 
     def sort(self):
-        ''' sort positions'''
+        ''' Sort positions'''
         self.positions.sort()
 
     def merge(self, positions):
         self.positions.extend(positions)
 
     def term_freq(self):
-        ''' return the term frequency in the document'''
+        ''' Return the term frequency in the document'''
         # TF is defined as the number of times the term appears in a given document
         # The current TF implementation does not account any log weighting or length normalization
         return len(self.positions)
@@ -41,13 +41,13 @@ class IndexItem:
         self.sorted_postings = []
 
     def add(self, docid, pos, classlabel):
-        ''' add a posting'''
+        ''' Add a posting'''
         if docid not in self.posting:
             self.posting[docid] = Posting(docid, classlabel)
         self.posting[docid].append(pos)
 
     def sort(self):
-        ''' sort by document ID for more efficient merging. For each document also sort the positions'''
+        ''' Sort by document ID for more efficient merging. For each document also sort the positions'''
         # Sort by document ID and save the sorted docID order to the self.sorted_postings list
         self.sorted_postings = sorted(self.posting.keys())
 
@@ -69,7 +69,7 @@ class InvertedIndex:
         
     # Indexing a Document object
     def indexDoc(self, doc):
-        ''' indexing a document, using the simple SPIMI algorithm '''
+        ''' Indexing a document, using the simple SPIMI algorithm '''
         document_terms = []
 
         # Tokenizing
@@ -99,20 +99,22 @@ class InvertedIndex:
                 self.items[term[0]].add(doc.docid, term[1], doc.classlabel)
         
         self.nDocs += 1
+    
+        return document_terms
 
     def sort(self):
-        ''' sort all posting lists by docid'''
+        ''' Sort all posting lists by docid'''
         for term in self.items:
             self.items[term].sort()
 
-        ''' sort the InvertedIndex by terms'''
+        ''' Sort the InvertedIndex by terms'''
         self.items = OrderedDict(sorted(self.items.items(), key=lambda t: t[0]))
 
     def find(self, term):
         return self.items.get(term, "None")
     
     def save(self, filename):
-        ''' save to disk'''
+        ''' Save to disk'''
         print("Saving to disk...")
         with open(filename, "w") as f:
             for term in self.items:
@@ -123,7 +125,7 @@ class InvertedIndex:
         print("InvertedIndex successfully saved to {}\n".format(filename))
 
     def load(self, filename):
-        ''' load from disk'''
+        ''' Load from disk'''
         print("Loading from disk...")
         with open(filename, "r") as f:
             data = f.readlines()
@@ -135,7 +137,7 @@ class InvertedIndex:
         print("InvertedIndex successfully loaded to memory from {}\n".format(filename))
 
     def idf(self, term):
-        ''' compute the inverted document frequency for a given term'''
+        ''' Compute the inverted document frequency for a given term'''
         # Return the IDF of the term
         # log(total documents/ documents with term i)
         return math.log(self.nDocs / len(self.items[term].sorted_postings), 10)
@@ -147,10 +149,10 @@ class Document:
         self.classlabel = int(classlabel)
 
 def doc_parser(doc, classlabel):
-    # Parse and create a Document Class Object
-    with open(doc, 'r') as f:
+    ''' Parse and create a Document Class Object '''
+    with open(doc, 'r', encoding="ascii", errors="surrogateescape") as f:
         body = " "
-        docid = doc.split("\\")[-1]
+        docid = doc.split("/")[-1]
         textblock = []
         num_lines = -1
         
@@ -203,52 +205,86 @@ def main():
     directory_of_newsgroups_data = sys.argv[1]
     mini_newsgroups = os.path.join(os.getcwd(), directory_of_newsgroups_data)
 
-    # # List of output files
-    # feature_definition_file = sys.argv[2]
-    # class_definition_file = sys.argv[3]
-    # training_data_file = sys.argv[4]
+    # List of output files
+    feature_definition_file = sys.argv[2]
+    class_definition_file = sys.argv[3]
+    training_data_file = sys.argv[4]
 
+    # Instantiate an invertedIndex and create class mappings
     invertedIndex = InvertedIndex()
     class_mappings = class_definition()
+    parsed_documents = []
 
-    # for newsgroups_directory in os.listdir(mini_newsgroups):
-    #     classlabel = class_mappings[newsgroups_directory]
-    #     documents_path = os.path.join(mini_newsgroups, newsgroups_directory)
-    #     print("\n-> Indexing {}".format(documents_path))
+    # Index all documents in the mini_newsgroups directory
+    for newsgroups_directory in os.listdir(mini_newsgroups):
+        classlabel = class_mappings[newsgroups_directory]
+        documents_path = os.path.join(mini_newsgroups, newsgroups_directory)
+        print("\n-> Indexing {}".format(documents_path))
 
-    #     with tqdm(total=len(os.listdir(documents_path))) as pbar:
-    #         for document in os.listdir(documents_path):
-    #             doc = os.path.join(documents_path, document)
-    #             docObj = doc_parser(doc, classlabel)
-    #             invertedIndex.indexDoc(docObj)
-    #             pbar.update(1)
+        with tqdm(total=len(os.listdir(documents_path))) as pbar:
+            for document in os.listdir(documents_path):
+                doc = os.path.join(documents_path, document)
+                docObj = doc_parser(doc, classlabel)
+                parsed_documents.append([docObj.docid, docObj.classlabel, invertedIndex.indexDoc(docObj)])
+                pbar.update(1)
 
-    # print("\nTotal documents indexed: {}".format(invertedIndex.nDocs))
-
-    path = os.path.join(os.getcwd(), "51121")
-    doc = doc_parser(path, 1)
-    invertedIndex.indexDoc(doc)
+    print("\nTotal documents indexed: {}".format(invertedIndex.nDocs))
 
     # Sort the invertedIndex
     invertedIndex.sort()
 
+    # Generate features (id and value) and write to training_data_files
+    print("\n-> Generating {}s".format(training_data_file))
+    with open("{}.TF".format(training_data_file), 'w') as f1:
+        with open("{}.IDF".format(training_data_file), 'w') as f2:
+            with open("{}.TFIDF".format(training_data_file), 'w') as f3:
+                with tqdm(total=len(parsed_documents)) as pbar:
+                    for document in parsed_documents:
+                        features_tf = []
+                        features_idf = []
+                        features_tfidf = []
+
+                        for term in document[2]:
+                            feature_id = invertedIndex.items[term].feature_id
+                            feature_tf = invertedIndex.items[term].posting[document[0]].term_freq()
+                            feature_idf = invertedIndex.idf(term)
+
+                            features_tf.append("{}:{}".format(feature_id, feature_tf))
+                            features_idf.append("{}:{:.5f}".format(feature_id, feature_idf))
+                            features_tfidf.append("{}:{:.5f}".format(feature_id, feature_tf * feature_idf))
+
+                        training_data_tf = " ".join(features_tf)
+                        training_data_idf = " ".join(features_idf)
+                        training_data_tfidf = " ".join(features_tfidf)
+
+                        f1.write("{} {}\n".format(document[1], training_data_tf))
+                        f2.write("{} {}\n".format(document[1], training_data_idf))
+                        f3.write("{} {}\n".format(document[1], training_data_tfidf))
+                        pbar.update(1)
+
+    # Generate a sorted features definition list
     features = []
     for item in invertedIndex.items.keys():
         features.append((invertedIndex.items[item].feature_id, item))
     features.sort()
 
     # Write to feature_definition_file
-    with open("feature_definition_file", 'w') as f:
+    print("\n-> Generating {}".format(feature_definition_file))
+    with open("{}".format(feature_definition_file), 'w') as f:
         for feature in features:
             f.write(str(feature[0]) + ", " + feature[1] + "\n")
+    print("Operation complete!")
 
     # Write to class_definition_file
-    with open("class_definition_file", 'w') as f:
+    print("\n-> Generating {}".format(class_definition_file))
+    with open("{}".format(class_definition_file), 'w') as f:
         for mapping in class_mappings:
             f.write(mapping + ", " + str(class_mappings[mapping]) + "\n")
+    print("Operation complete!")
     
+    print("\n-> All done!")
+
     # Save the invertedIndex
     # invertedIndex.save("index_file")
-
 
 main()
