@@ -1,0 +1,7 @@
+jsonpickle
+scipy
+numpy
+nltk
+tqdm
+sklearn
+matplotlib
