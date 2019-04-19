@@ -1,9 +1,11 @@
+# PART 1: EXTRACTING FEATURES
+
 import os
 import sys
 import math
 import nltk
-# nltk.download('punkt')
-# nltk.download('stopwords')
+nltk.download('punkt')
+nltk.download('stopwords')
 import jsonpickle
 
 from tqdm import tqdm
@@ -177,6 +179,7 @@ def doc_parser(doc, classlabel):
     return doc
 
 def class_definition():
+    # Create the class mappings
     class_mappings = {"comp.graphics": 1,
                       "comp.os.ms-windows.misc": 1,
                       "comp.sys.ibm.pc.hardware": 1,

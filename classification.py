@@ -1,3 +1,5 @@
+# PART 2: CLASSIFICATION
+
 import sys
 import warnings
 warnings.filterwarnings('ignore')
@@ -12,24 +14,25 @@ from sklearn.model_selection import cross_validate
 from sklearn.metrics import recall_score
 
 def classification(classifier, feature_vectors, targets, k_fold = 5):
-    # Multinominal Naive Bayes: https://scikit-learn.org/stable/modules/generated/sklearn.naive_bayes.MultinomialNB.html
-    if classifier == "Multinominal N. Bayes":
+    # Multinomial Naive Bayes: https://scikit-learn.org/stable/modules/generated/sklearn.naive_bayes.MultinomialNB.html
+    if classifier == "Multinomial NB":
         algo = MultinomialNB()
     
     # Bernoulli Naive Bayes: https://scikit-learn.org/stable/modules/generated/sklearn.naive_bayes.BernoulliNB.html
-    elif classifier == "Bernoulli N. Bayes":
+    elif classifier == "Bernoulli NB":
         algo = BernoulliNB()
     
     # k-Nearest Neighbor: https://scikit-learn.org/stable/modules/generated/sklearn.neighbors.KNeighborsClassifier.html
-    elif classifier  == "k-Nearest Neighbor":
+    elif classifier  == "kN-Neighbor":
         algo = KNeighborsClassifier()
 
     # Support Vector Machine: https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVC.html
-    elif classifier == "Support Vector Machine":
+    elif classifier == "SV-Machine":
         algo = SVC(gamma='auto')
 
     algo.fit(feature_vectors, targets)
 
+    # Compute the performance metrics
     f1_macro = cross_val_score(algo, feature_vectors, targets, cv=k_fold, scoring='f1_macro')
     precision_macro = cross_val_score(algo, feature_vectors, targets, cv=k_fold, scoring='precision_macro')
     recall_macro = cross_val_score(algo, feature_vectors, targets, cv=k_fold, scoring='recall_macro')
@@ -38,13 +41,13 @@ def classification(classifier, feature_vectors, targets, k_fold = 5):
 
 def main():
     training_data_files = ["training_data_file.TF", "training_data_file.IDF", "training_data_file.TFIDF"]
-    classifiers = ["Multinominal N. Bayes", "Bernoulli N. Bayes", "k-Nearest Neighbor", "Support Vector Machine"]
+    classifiers = ["Multinomial NB", "Bernoulli NB", "kN-Neighbor", "SV-Machine"]
     
     for training_data_file in training_data_files:
         feature_vectors, targets = load_svmlight_file(training_data_file)
 
         print("\n-> Classifiers Evaluation using {}\n".format(training_data_file))
-        print("\t\t\t\tF1 Macro\t\tPrecision Macro\t\tRecall Macro")
+        print("\t\t\tF1 Macro\t\tPrecision Macro\t\tRecall Macro")
         
         # Training classifiers with default parameters
         for classifier in classifiers:

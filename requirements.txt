@@ -1,7 +1,8 @@
+nltk
 jsonpickle
+tqdm
+collections
+sklearn
 scipy
 numpy
-nltk
-tqdm
-sklearn
 matplotlib

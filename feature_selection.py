@@ -1,3 +1,5 @@
+# PART 3: FEATURE SELECTION
+
 import os
 import numpy as np
 import matplotlib as mpl
@@ -10,12 +12,12 @@ from sklearn.feature_selection import chi2, mutual_info_classif
 
 def plot_curve(selection_method, feature_vectors, targets):
     # List of classifiers
-    classifiers = ["Multinominal N. Bayes", "Bernoulli N. Bayes", "k-Nearest Neighbor", "Support Vector Machine"]
+    classifiers = ["Multinomial NB", "Bernoulli NB", "kN-Neighbor", "SV-Machine"]
     best_k_no = []
 
     # List of top K features number
     top_k_features_no = []
-    for top_k in range(100, 22000, 300):
+    for top_k in range(100, 10000, 300):
         top_k_features_no.append(top_k)
 
     # Plot Configurations
@@ -28,10 +30,10 @@ def plot_curve(selection_method, feature_vectors, targets):
     plt.xlim = (0, 22500)
     plt.ylim = (0, 101)
     plt.grid()
-    plt_color = {"Multinominal N. Bayes": "r",
-                  "Bernoulli N. Bayes": "g",
-                  "k-Nearest Neighbor": "b",
-                  "Support Vector Machine": "y"}
+    plt_color = {"Multinomial NB": "r",
+                 "Bernoulli NB": "g",
+                 "kN-Neighbor": "b",
+                 "SV-Machine": "y"}
     
     # Plotting figures for each classifier with different selection methods
     for classifier in classifiers:
@@ -88,7 +90,9 @@ def main():
         # Show the best performing K number for each classifier
         print("\n-> The best performing K using {} method".format(selection_method))
         for k in best_k_no:
-            print("---> {}\t\t\t{}".format(k[0], k[1]))
+            print("---> {}: {}".format(k[0], k[1]))
+    
+    print("\n-> All done!")
         
 if __name__ == '__main__':
     main()
