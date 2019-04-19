@@ -17,7 +17,7 @@ def plot_curve(selection_method, feature_vectors, targets):
 
     # List of top K features number
     top_k_features_no = []
-    for top_k in range(100, 10000, 300):
+    for top_k in range(100, 22000, 300):
         top_k_features_no.append(top_k)
 
     # Plot Configurations
@@ -61,7 +61,7 @@ def plot_curve(selection_method, feature_vectors, targets):
 
         # Retrieve the best performing number of K
         argmax_f1 = np.argmax(top_k_f1_macro)
-        best_k_no.append((classifier, top_k_features_no[argmax_f1]))
+        best_k_no.append((classifier, top_k_features_no[argmax_f1], max(top_k_f1_macro)))
 
         # Plot figure
         plt.fill_between(top_k_features_no, top_k_f1_macro_nstd_dev, top_k_f1_macro_pstd_dev, alpha=0.1, color=plt_color[classifier])
@@ -90,7 +90,7 @@ def main():
         # Show the best performing K number for each classifier
         print("\n-> The best performing K using {} method".format(selection_method))
         for k in best_k_no:
-            print("---> {}: {}".format(k[0], k[1]))
+            print("---> {}: {} ({:.2f}%)".format(k[0], k[1], k[2]))
     
     print("\n-> All done!")
         
