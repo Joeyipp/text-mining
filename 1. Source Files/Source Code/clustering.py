@@ -1,4 +1,5 @@
 # PART 4: DOCUMENT CLUSTERING
+# COMMANDLINE USAGE: python3 clustering.py
 
 import os
 import warnings

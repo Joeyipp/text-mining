@@ -1,4 +1,5 @@
 # PART 3: FEATURE SELECTION
+# COMMANDLINE USAGE: python3 feature_selection.py
 
 import os
 import numpy as np

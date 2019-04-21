@@ -1,4 +1,5 @@
 # PART 2: CLASSIFICATION
+# COMMANDLINE USAGE: python3 classification.py
 
 import sys
 import warnings

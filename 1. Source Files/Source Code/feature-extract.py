@@ -1,4 +1,5 @@
 # PART 1: EXTRACTING FEATURES
+# COMMANDLINE USAGE: python3 feature-extract.py mini_newsgroups feature_definition_file class_definition_file training_data_file
 
 import os
 import sys
