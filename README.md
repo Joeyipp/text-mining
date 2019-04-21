@@ -26,8 +26,8 @@ To run the scripts locally:
 
 ### Results
 <p float="left">
-  <img src="https://github.com/Joeyipp/text-mining/blob/master/images/chi_squared.png" width="500" />
-  <img src="https://github.com/Joeyipp/text-mining/blob/master/images/mutual_information.png" width="500" /> 
+  <img src="https://github.com/Joeyipp/text-mining/blob/master/images/chi_squared.png" width="400" />
+  <img src="https://github.com/Joeyipp/text-mining/blob/master/images/mutual_information.png" width="400" /> 
 </p>
 
 ### Part 3: Clustering
@@ -35,8 +35,8 @@ To run the scripts locally:
 
 ### Results
 <p float="left">
-  <img src="https://github.com/Joeyipp/text-mining/blob/master/images/silhouette_coefficient.png" width="500" />
-  <img src="https://github.com/Joeyipp/text-mining/blob/master/images/normalized_mutual_information.png" width="500" /> 
+  <img src="https://github.com/Joeyipp/text-mining/blob/master/images/silhouette_coefficient.png" width="400" />
+  <img src="https://github.com/Joeyipp/text-mining/blob/master/images/normalized_mutual_information.png" width="400" /> 
 </p>
 
 ### References
