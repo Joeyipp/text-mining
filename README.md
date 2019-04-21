@@ -9,12 +9,12 @@ To run the scripts locally:
 3. For complete documentation, refer [to this document](https://github.com/Joeyipp/text-mining/blob/master/documentation/Design_Documentation.pdf).
 
 ### System Architecture
-![Sample](https://github.com/Joeyipp/simple-search-engine/blob/master/documentation/Design_Flowchart.png)
+![Sample](https://github.com/Joeyipp/text-mining/blob/master/documentation/Design_Flowchart.png)
 
 ### Part 1: Feature Extraction
 > ```python3 feature-extract.py mini_newsgroups feature_definition_file class_definition_file training_data_file```
 
-![Sample](https://github.com/Joeyipp/text-mining/blob/master/images/feature_extract.png)
+![Sample](https://github.com/Joeyipp/text-mining/blob/master/images/feature_extract.PNG)
 
 ### Part 2: Classification
 > ```python3 classification.py```
