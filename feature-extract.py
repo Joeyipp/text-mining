@@ -203,8 +203,58 @@ def class_definition():
     
     return class_mappings
 
-def main():
+def test():
+    # Get directory of newsgroups data
+    directory_of_newsgroups_data = sys.argv[1]
+    mini_newsgroups = os.path.join(os.getcwd(), directory_of_newsgroups_data)
 
+    # List of output files
+    feature_definition_file = sys.argv[2]
+    class_definition_file = sys.argv[3]
+    training_data_file = sys.argv[4]
+
+    # Instantiate an invertedIndex
+    invertedIndex = InvertedIndex()
+    parsed_document = []
+
+    # Test Class Definition
+    print("\n-> Testing Class Definition")
+    class_mappings = class_definition()
+    print(class_mappings)
+
+    # Test Indexing
+    newsgroups_directory = os.listdir(mini_newsgroups)[0]
+    documents_path = os.path.join(mini_newsgroups, newsgroups_directory)
+    
+    # Test Class Mappings
+    classlabel = class_mappings[newsgroups_directory]
+    
+    # Test Indexing and Document Parser
+    document = os.listdir(documents_path)[0]
+    doc = os.path.join(documents_path, document)
+    docObj = doc_parser(doc, classlabel)
+    print("\n-> Indexing {}".format(doc))
+    print("---> Class Label: {}".format(docObj.classlabel))
+    print("---> Document ID: {}".format(docObj.docid))
+    print("---> Document Body:\n{}".format(docObj.body))
+    
+    # Sort the invertedIndex
+    invertedIndex.sort()
+
+    # Parsed Document
+    parsed_document.append([docObj.docid, docObj.classlabel, invertedIndex.indexDoc(docObj)])
+    print("\n-> Parsed Document Terms (Tokenized -> LowerCase -> Stopwords Removed -> Stemmed)")
+    print("---> {}".format(parsed_document[0][2]))
+    print("\nTotal documents indexed: {}".format(invertedIndex.nDocs))
+
+    print("\n-> Term: Feature ID: TF")
+    for term in parsed_document[0][2]:
+        feature_id = invertedIndex.items[term].feature_id
+        feature_tf = invertedIndex.items[term].posting[parsed_document[0][0]].term_freq()
+        print("{}".format(term))
+        print("FID: {}, TF: {}\n".format(feature_id, feature_tf))
+
+def main():
     # Get directory of newsgroups data
     directory_of_newsgroups_data = sys.argv[1]
     mini_newsgroups = os.path.join(os.getcwd(), directory_of_newsgroups_data)
@@ -309,3 +359,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+    #test()

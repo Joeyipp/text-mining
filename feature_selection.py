@@ -17,7 +17,7 @@ def plot_curve(selection_method, feature_vectors, targets):
 
     # List of top K features number
     top_k_features_no = []
-    for top_k in range(100, 22000, 300):
+    for top_k in range(100, 12000, 300):
         top_k_features_no.append(top_k)
 
     # Plot Configurations

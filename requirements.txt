@@ -1,7 +1,6 @@
 nltk
 jsonpickle
 tqdm
-collections
 sklearn
 scipy
 numpy
